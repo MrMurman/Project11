@@ -216,34 +216,54 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+//    func ballCreator() -> SKSpriteNode{
+//
+//
+//        enum Color: Int {
+//            case blue = 1, cyan, green, grey, purple, red, yellow
+//
+//            var color: String {
+//                switch self {
+//                case .blue:
+//                    return "ballBlue"
+//                case .cyan:
+//                    return "ballCyan"
+//                case .green:
+//                    return "ballGreen"
+//                case .grey:
+//                    return "ballGrey"
+//                case .purple:
+//                    return "ballPurple"
+//                case .red:
+//                    return "ballRed"
+//                case .yellow:
+//                    return "ballYellow"
+//                }
+//            }
+//        }
+//
+//
+//        return SKSpriteNode(imageNamed: Color(rawValue: Int.random(in: 1...7))!.color)
+//
+//    }
+    
+    
     func ballCreator() -> SKSpriteNode{
         
         
-        enum Color: Int {
-            case blue = 1, cyan, green, grey, purple, red, yellow
+        enum Color: String, CaseIterable {
+            case blue = "ballBlue"
+            case cyan = "ballCyan"
+            case green = "ballGreen"
+            case grey = "ballGrey"
+            case purple = "ballPurple"
+            case red = "ballRed"
+            case yellow = "ballYellow"
             
-            var color: String {
-                switch self {
-                case .blue:
-                    return "ballBlue"
-                case .cyan:
-                    return "ballCyan"
-                case .green:
-                    return "ballGreen"
-                case .grey:
-                    return "ballGrey"
-                case .purple:
-                    return "ballPurple"
-                case .red:
-                    return "ballRed"
-                case .yellow:
-                    return "ballYellow"
-                }
-            }
         }
     
         
-        return SKSpriteNode(imageNamed: Color(rawValue: Int.random(in: 1...7))!.color)
+        return SKSpriteNode(imageNamed: Color.allCases.randomElement()!.rawValue)
         
     }
     
