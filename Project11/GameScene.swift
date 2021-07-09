@@ -18,6 +18,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    var ballCount = 5 {
+        didSet {
+            livesLabel.text = "Lives: \(ballCount)"
+        }
+    }
+    
+    
     var editLabel: SKLabelNode!
     
     var editingMode: Bool = false {
@@ -29,6 +36,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
     }
+    
+    var livesLabel: SKLabelNode!
+    
+    var barrierArray: [SKSpriteNode]?
+    
    
     override func didMove(to view: SKView) {
         let background = SKSpriteNode(imageNamed: "background")
@@ -42,6 +54,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreLabel.horizontalAlignmentMode = .right
         scoreLabel.position = CGPoint(x: 980, y: 700)
         addChild(scoreLabel)
+        
+        livesLabel = SKLabelNode(fontNamed: "Chalkduster")
+        livesLabel.text = "Lives: 5"
+        livesLabel.horizontalAlignmentMode = .right
+        livesLabel.position = CGPoint(x: 980, y: 650)
+        addChild(livesLabel)
         
         editLabel = SKLabelNode(fontNamed: "Chalkduster")
         editLabel.text = "Edit"
@@ -86,16 +104,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 
                 box.physicsBody = SKPhysicsBody(rectangleOf: size)
                 box.physicsBody?.isDynamic = false
+                
+                box.name = "box"
                 addChild(box)
+                barrierArray?.append(box)
             } else {
-                let ball = SKSpriteNode(imageNamed: "ballRed")
+                let ball = ballCreator()
+                
                 ball.physicsBody = SKPhysicsBody(circleOfRadius: ball.size.width / 2.0)
                 ball.physicsBody?.restitution = 0.4
                 ball.physicsBody?.contactTestBitMask = ball.physicsBody?.collisionBitMask ?? 0
-                ball.position = location
+                ball.position = CGPoint(x: location.x, y: 700)
                 ball.name = "ball"
                 
                 addChild(ball)
+
             }
         }
     }
@@ -138,9 +161,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func collision(between ball: SKNode, object: SKNode) {
-        if object.name == "good" {
+        guard ballCount > 0 else {
+            let ac = UIAlertController(title: "Game Over", message: nil, preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Restart", style: .default) { [weak self] _ in
+                self?.score = 0
+                self?.ballCount = 0
+                if let barrierArray = self?.barrierArray {
+                    for barrier in barrierArray {
+                        barrier.removeFromParent()
+                    }
+                }
+               
+            })
+            return
+        }
+        if object.name == "box" {
+            destroy(ball: ball)
+            ballCount -= 1
+            
+            print(ballCount)
+        } else if object.name == "good" {
             destroy(ball: ball)
             score += 1
+            ballCount += 1
+            
+            print(ballCount)
         } else if object.name == "bad" {
             destroy(ball: ball)
             score -= 1
@@ -153,6 +198,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             fireParticles.position = ball.position
             addChild(fireParticles)
         }
+        
+        
+        
         ball.removeFromParent()
         
     }
@@ -166,6 +214,37 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else if nodeB.name == "ball" {
             collision(between: nodeB, object: nodeA)
         }
+    }
+    
+    func ballCreator() -> SKSpriteNode{
+        
+        
+        enum Color: Int {
+            case blue = 1, cyan, green, grey, purple, red, yellow
+            
+            var color: String {
+                switch self {
+                case .blue:
+                    return "ballBlue"
+                case .cyan:
+                    return "ballCyan"
+                case .green:
+                    return "ballGreen"
+                case .grey:
+                    return "ballGrey"
+                case .purple:
+                    return "ballPurple"
+                case .red:
+                    return "ballRed"
+                case .yellow:
+                    return "ballYellow"
+                }
+            }
+        }
+    
+        
+        return SKSpriteNode(imageNamed: Color(rawValue: Int.random(in: 1...7))!.color)
+        
     }
     
 }
